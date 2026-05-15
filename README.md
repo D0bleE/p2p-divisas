@@ -11,11 +11,6 @@ Sistema web P2P para intercambio de divisas entre usuarios mediante publicación
 - Kiara Ruiz Vásquez
 - Ivan Villegas Alarcon
 
-## Tecnologías
-- ASP.NET Core Web API (.NET 10)
-- Vue.js
-- SQL Server
-
 ## Funcionalidades
 - Registro e inicio de sesión
 - Publicación de ofertas
