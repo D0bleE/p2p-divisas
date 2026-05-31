@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="CambioDivisasP2P.API/CambioDivisasP2P.API.csproj" />
+  <Project Path="CambioDivisasP2P.CORE/CambioDivisasP2P.CORE.csproj" />
+</Solution>
