@@ -1,0 +1,16 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\CambioDivisasP2P.API",
+    "\\CambioDivisasP2P.API\\Controllers",
+    "\\CambioDivisasP2P.API\\Interfaces",
+    "\\CambioDivisasP2P.API\\Properties",
+    "\\CambioDivisasP2P.API\\Services",
+    "\\CambioDivisasP2P.CORE",
+    "\\CambioDivisasP2P.CORE\\Core",
+    "\\CambioDivisasP2P.CORE\\Core\\DTOs",
+    "\\CambioDivisasP2P.CORE\\Core\\Entities"
+  ],
+  "SelectedNode": "\\CambioDivisasP2P.API\\Program.cs",
+  "PreviewInSolutionExplorer": false
+}

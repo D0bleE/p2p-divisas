@@ -30,3 +30,8 @@ app.UseAuthorization();
 app.MapControllers();
 
 app.Run();
+builder.Services.AddScoped<IOfertaService, OfertaService>();
+builder.Services.AddScoped<IBilleteraService, BilleteraService>();
+builder.Services.AddScoped<IOfertaService, OfertaService>();
+builder.Services.AddScoped<IBilleteraService, BilleteraService>();
+builder.Services.AddScoped<IAuthService, AuthService>();
