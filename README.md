@@ -10,6 +10,7 @@ Sistema web P2P para intercambio de divisas entre usuarios mediante publicación
 - Estefano Villacorta Garcia
 - Kiara Ruiz Vásquez
 - Ivan Villegas Alarcon
+- Manuel Saavedra Escudero
 
 ## Funcionalidades
 - Registro e inicio de sesión
