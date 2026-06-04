@@ -11,6 +11,7 @@ Sistema web P2P para intercambio de divisas entre usuarios mediante publicación
 - Kiara Ruiz Vásquez
 - Ivan Villegas Alarcon
 - Manuel Saavedra Escudero
+- Victor Carbajal Cardenas
 
 ## Funcionalidades
 - Registro e inicio de sesión
@@ -27,3 +28,4 @@ Sistema web P2P para intercambio de divisas entre usuarios mediante publicación
 
 ## Estado Actual
 Sprint Semana 6 - Análisis y prototipado
+Sprint Semana 9 - Proyecto backend (API)
