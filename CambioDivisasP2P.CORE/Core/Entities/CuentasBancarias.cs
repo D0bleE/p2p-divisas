@@ -15,7 +15,7 @@ public partial class CuentasBancarias
 
     public string NumeroCuenta { get; set; } = null!;
 
-    public string? NumeroCci { get; set; }
+    public string? NumeroCCI { get; set; }
 
     public string TitularNombre { get; set; } = null!;
 
