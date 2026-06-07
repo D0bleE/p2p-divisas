@@ -97,7 +97,7 @@ public partial class CambioDivisasP2PContext : DbContext
             entity.Property(e => e.Banco)
                 .HasMaxLength(50)
                 .IsUnicode(false);
-            entity.Property(e => e.NumeroCci)
+            entity.Property(e => e.NumeroCCI)
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("NumeroCCI");
