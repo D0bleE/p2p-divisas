@@ -16,6 +16,7 @@ namespace CambioDivisasP2P.API.Controllers
             _context = context;
         }
 
+        // US-06 INICIO DE TRANSACCIONES ENTRE USUARIOS
         [HttpPost("iniciar")]
         public async Task<IActionResult> IniciarTransaccion([FromBody] TransaccionDTO model)
         {
@@ -24,17 +25,26 @@ namespace CambioDivisasP2P.API.Controllers
 
             if (oferta == null)
             {
-                return NotFound(new { message = "La oferta no existe." });
+                return NotFound(new
+                {
+                    message = "La oferta no existe."
+                });
             }
 
             if (oferta.Estado != "ACTIVA")
             {
-                return BadRequest(new { message = "La oferta ya no está disponible." });
+                return BadRequest(new
+                {
+                    message = "La oferta ya no está disponible."
+                });
             }
 
             if (oferta.UsuarioId == model.UsuarioContraparteId)
             {
-                return BadRequest(new { message = "No puedes aceptar tu propia oferta." });
+                return BadRequest(new
+                {
+                    message = "No puedes aceptar tu propia oferta."
+                });
             }
 
             var transaccion = new Transacciones
@@ -46,11 +56,13 @@ namespace CambioDivisasP2P.API.Controllers
                 MonedaDestinoId = oferta.MonedaDestinoId,
 
                 MontoOrigen = oferta.MontoOrigen,
-                MontoDestino = Math.Round(oferta.MontoOrigen * oferta.TasaCambio, 2),
+                MontoDestino = Math.Round(
+                    oferta.MontoOrigen * oferta.TasaCambio, 2),
 
                 TasaCambioPactada = oferta.TasaCambio,
 
-                Estado = "PENDIENTE",
+                // CORREGIDO PARA SQL SERVER
+                Estado = "PENDIENTE_PAGO",
 
                 FechaInicio = DateTime.Now,
                 FechaActualizacion = DateTime.Now
@@ -69,6 +81,87 @@ namespace CambioDivisasP2P.API.Controllers
             });
         }
 
+        // US-07 VISUALIZAR ESTADO DE TRANSACCIONES
+        [HttpGet("usuario/{usuarioId}")]
+        public async Task<IActionResult> ObtenerMisTransacciones(int usuarioId)
+        {
+            var transacciones = await _context.Transacciones
+                .Where(t => t.UsuarioContraparteId == usuarioId)
+                .Select(t => new
+                {
+                    t.Id,
+                    t.OfertaId,
+
+                    Estado = ObtenerEstadoLegible(t.Estado),
+
+                    t.MontoOrigen,
+                    t.MontoDestino,
+                    t.FechaInicio,
+                    t.FechaActualizacion
+                })
+                .ToListAsync();
+
+            return Ok(transacciones);
+        }
+
+        // US-07 CAMBIAR ESTADO DE TRANSACCIÓN
+        [HttpPut("{id}/estado")]
+        public async Task<IActionResult> ActualizarEstado(
+            int id,
+            [FromBody] ActualizarEstadoDTO model)
+        {
+            var transaccion = await _context.Transacciones
+                .FirstOrDefaultAsync(t => t.Id == id);
+
+            if (transaccion == null)
+            {
+                return NotFound(new
+                {
+                    message = "Transacción no encontrada."
+                });
+            }
+
+            var estadosPermitidos = new List<string>
+            {
+                "PENDIENTE_PAGO",
+                "PAGO_REPORTADO",
+                "COMPLETADA",
+                "CANCELADA"
+            };
+
+            if (!estadosPermitidos.Contains(model.NuevoEstado))
+            {
+                return BadRequest(new
+                {
+                    message = "Estado inválido."
+                });
+            }
+
+            transaccion.Estado = model.NuevoEstado;
+            transaccion.FechaActualizacion = DateTime.Now;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(new
+            {
+                message = "Estado actualizado correctamente.",
+                nuevoEstado = ObtenerEstadoLegible(
+                    transaccion.Estado)
+            });
+        }
+
+        // MÉTODO AUXILIAR PARA MOSTRAR ESTADOS BONITOS
+        private string ObtenerEstadoLegible(string estado)
+        {
+            return estado switch
+            {
+                "PENDIENTE_PAGO" => "Pendiente",
+                "PAGO_REPORTADO" => "Pago Enviado",
+                "COMPLETADA" => "Finalizada",
+                "CANCELADA" => "Cancelada",
+                _ => estado
+            };
+        }
         // ENDPOINT: Historial de transacciones del usuario
         [HttpGet("historial")]
         public async Task<IActionResult> ObtenerHistorial(
