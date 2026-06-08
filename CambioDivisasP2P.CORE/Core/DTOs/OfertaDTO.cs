@@ -41,4 +41,10 @@ namespace CambioDivisasP2P.CORE.Core.DTOs
         public string Estado { get; set; } = null!;
         public DateTime FechaPublicacion { get; set; }
     }
+
+    public class OfertaAceptarDTO
+        {
+            public int CompradorUsuarioId { get; set; } // El usuario que va a tomar la oferta
+        }
+    
 }

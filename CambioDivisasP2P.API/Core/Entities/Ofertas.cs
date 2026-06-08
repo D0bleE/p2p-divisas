@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CambioDivisasP2P.CORE.Core.Entities;
+namespace CambioDivisasP2P.API.Core.Entities;
 
 public partial class Ofertas
 {
@@ -21,13 +21,7 @@ public partial class Ofertas
 
     public DateTime? FechaPublicacion { get; set; }
 
-    public virtual Monedas MonedaDestino { get; set; } = null!;
-
-    public virtual Monedas MonedaOrigen { get; set; } = null!;
-
-    public virtual ICollection<Transacciones> Transacciones { get; set; } = new List<Transacciones>();
-
-    public virtual Usuarios Usuario { get; set; } = null!;
     public int? UsuarioCompradorId { get; set; }
+
     public DateTime? FechaTransaccion { get; set; }
 }

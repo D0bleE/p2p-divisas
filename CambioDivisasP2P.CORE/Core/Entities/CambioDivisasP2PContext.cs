@@ -228,6 +228,8 @@ public partial class CambioDivisasP2PContext : DbContext
                 .HasForeignKey(d => d.UsuarioId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Ofertas__Usuario__7B264821");
+            entity.Property(e => e.UsuarioCompradorId).HasColumnName("UsuarioCompradorId");
+            entity.Property(e => e.FechaTransaccion).HasColumnType("datetime").HasColumnName("FechaTransaccion");
         });
 
         modelBuilder.Entity<Roles>(entity =>
