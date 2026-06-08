@@ -14,6 +14,7 @@ namespace CambioDivisasP2P.CORE.Core.DTOs
         public int MonedaDestinoId { get; set; }  // Moneda que el usuario quiere recibir
         public decimal MontoOrigen { get; set; }   // Cantidad a cambiar
         public decimal TasaCambio { get; set; }    // Tipo de cambio fijado por el usuario
+        public string? Descripcion { get; set; }   // Breve descripción opcional
     }
 
     // DTO estructurado para la Pizarra del Mercado (Carga banderas, siglas y cálculos)
