@@ -24,4 +24,16 @@ public partial class Ofertas
     public int? UsuarioCompradorId { get; set; }
 
     public DateTime? FechaTransaccion { get; set; }
+
+    public virtual ICollection<Calificaciones> Calificaciones { get; set; } = new List<Calificaciones>();
+
+    public virtual ICollection<Disputas> Disputas { get; set; } = new List<Disputas>();
+
+    public virtual Monedas MonedaDestino { get; set; } = null!;
+
+    public virtual Monedas MonedaOrigen { get; set; } = null!;
+
+    public virtual Usuarios Usuario { get; set; } = null!;
+
+    public virtual Usuarios? UsuarioComprador { get; set; }
 }

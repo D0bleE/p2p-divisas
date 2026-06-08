@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CambioDivisasP2P.CORE.Core.Entities;
+namespace CambioDivisasP2P.API.Core.Entities;
 
 public partial class Disputas
 {
     public int Id { get; set; }
-
-    public int TransaccionId { get; set; }
 
     public int UsuarioDemandanteId { get; set; }
 
@@ -21,9 +19,9 @@ public partial class Disputas
 
     public DateTime? FechaResolucion { get; set; }
 
-    public virtual Usuarios UsuarioDemandante { get; set; } = null!;
-    
     public int? OfertaId { get; set; }
 
-    public virtual Ofertas Oferta { get; set; }
+    public virtual Ofertas? Oferta { get; set; }
+
+    public virtual Usuarios UsuarioDemandante { get; set; } = null!;
 }

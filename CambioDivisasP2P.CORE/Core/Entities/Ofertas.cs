@@ -25,8 +25,6 @@ public partial class Ofertas
 
     public virtual Monedas MonedaOrigen { get; set; } = null!;
 
-    public virtual ICollection<Transacciones> Transacciones { get; set; } = new List<Transacciones>();
-
     public virtual Usuarios Usuario { get; set; } = null!;
     public int? UsuarioCompradorId { get; set; }
     public DateTime? FechaTransaccion { get; set; }

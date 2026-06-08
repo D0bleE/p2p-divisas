@@ -31,11 +31,7 @@ public partial class CambioDivisasP2PContext : DbContext
 
     public virtual DbSet<Roles> Roles { get; set; }
 
-    public virtual DbSet<Transacciones> Transacciones { get; set; }
-
     public virtual DbSet<Usuarios> Usuarios { get; set; }
-
-    public virtual DbSet<Vouchers> Vouchers { get; set; }
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
@@ -65,26 +61,40 @@ public partial class CambioDivisasP2PContext : DbContext
 
         modelBuilder.Entity<Calificaciones>(entity =>
         {
+            // 1. Llave primaria limpia
             entity.HasKey(e => e.Id).HasName("PK__Califica__3214EC07FD593ED7");
+
+            // 2. Mapeo explícito de columnas
+            entity.Property(e => e.OfertaId).HasColumnName("OfertaId");
+            entity.Property(e => e.UsuarioEvaluadorId).HasColumnName("UsuarioEvaluadorId");
+            entity.Property(e => e.UsuarioEvaluadoId).HasColumnName("UsuarioEvaluadoId");
+            entity.Property(e => e.Puntuacion).HasColumnName("Puntuacion");
 
             entity.Property(e => e.Comentario)
                 .HasMaxLength(255)
                 .IsUnicode(false);
+
             entity.Property(e => e.Fecha)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
 
-            entity.HasOne(d => d.Transaccion).WithMany(p => p.Calificaciones)
-                .HasForeignKey(d => d.TransaccionId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Calificac__Trans__11158940");
+            // 3. Relación limpia con la tabla Ofertas
+            entity.HasOne(d => d.Oferta)
+                .WithMany()
+                .HasForeignKey(d => d.OfertaId)
+                .HasConstraintName("FK_Calificaciones_Ofertas")
+                .OnDelete(DeleteBehavior.Cascade); // Si se borra la oferta, se borra su calificación
 
-            entity.HasOne(d => d.UsuarioEvaluado).WithMany(p => p.CalificacionesUsuarioEvaluado)
+            // 4. Relación con el Usuario Evaluado
+            entity.HasOne(d => d.UsuarioEvaluado)
+                .WithMany(p => p.CalificacionesUsuarioEvaluado)
                 .HasForeignKey(d => d.UsuarioEvaluadoId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Calificac__Usuar__12FDD1B2");
 
-            entity.HasOne(d => d.UsuarioEvaluador).WithMany(p => p.CalificacionesUsuarioEvaluador)
+            // 5. Relación con el Usuario Evaluador
+            entity.HasOne(d => d.UsuarioEvaluador)
+                .WithMany(p => p.CalificacionesUsuarioEvaluador)
                 .HasForeignKey(d => d.UsuarioEvaluadorId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Calificac__Usuar__1209AD79");
@@ -136,10 +146,13 @@ public partial class CambioDivisasP2PContext : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.Resolucion).IsUnicode(false);
 
-            entity.HasOne(d => d.Transaccion).WithMany(p => p.Disputas)
-                .HasForeignKey(d => d.TransaccionId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Disputas__Transa__18B6AB08");
+            entity.HasKey(e => e.Id);
+            entity.Property(e => e.OfertaId).HasColumnName("OfertaId");
+
+            entity.HasOne(d => d.Oferta)
+                .WithMany()
+                .HasForeignKey(d => d.OfertaId)
+                .HasConstraintName("FK_Disputas_Ofertas");
 
             entity.HasOne(d => d.UsuarioDemandante).WithMany(p => p.Disputas)
                 .HasForeignKey(d => d.UsuarioDemandanteId)
@@ -246,45 +259,7 @@ public partial class CambioDivisasP2PContext : DbContext
                 .IsUnicode(false);
         });
 
-        modelBuilder.Entity<Transacciones>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__Transacc__3214EC07140B2273");
-
-            entity.Property(e => e.Estado)
-                .HasMaxLength(30)
-                .IsUnicode(false)
-                .HasDefaultValue("PENDIENTE_PAGO");
-            entity.Property(e => e.FechaActualizacion)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.FechaInicio)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.MontoDestino).HasColumnType("decimal(18, 2)");
-            entity.Property(e => e.MontoOrigen).HasColumnType("decimal(18, 2)");
-            entity.Property(e => e.TasaCambioPactada).HasColumnType("decimal(18, 4)");
-
-            entity.HasOne(d => d.MonedaDestino).WithMany(p => p.TransaccionesMonedaDestino)
-                .HasForeignKey(d => d.MonedaDestinoId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Transacci__Moned__078C1F06");
-
-            entity.HasOne(d => d.MonedaOrigen).WithMany(p => p.TransaccionesMonedaOrigen)
-                .HasForeignKey(d => d.MonedaOrigenId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Transacci__Moned__0697FACD");
-
-            entity.HasOne(d => d.Oferta).WithMany(p => p.Transacciones)
-                .HasForeignKey(d => d.OfertaId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Transacci__Ofert__04AFB25B");
-
-            entity.HasOne(d => d.UsuarioContraparte).WithMany(p => p.Transacciones)
-                .HasForeignKey(d => d.UsuarioContraparteId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Transacci__Usuar__05A3D694");
-        });
-
+        
         modelBuilder.Entity<Usuarios>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Usuarios__3214EC0755E1D146");
@@ -313,25 +288,6 @@ public partial class CambioDivisasP2PContext : DbContext
                 .HasForeignKey(d => d.RolId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Usuarios__RolId__3D5E1FD2");
-        });
-
-        modelBuilder.Entity<Vouchers>(entity =>
-        {
-            entity.HasKey(e => e.Id).HasName("PK__Vouchers__3214EC0750A44C0F");
-
-            entity.HasIndex(e => e.TransaccionId, "UQ__Vouchers__86A849FF4119BE88").IsUnique();
-
-            entity.Property(e => e.FechaSubida)
-                .HasDefaultValueSql("(getdate())")
-                .HasColumnType("datetime");
-            entity.Property(e => e.RutaImagen)
-                .HasMaxLength(255)
-                .IsUnicode(false);
-
-            entity.HasOne(d => d.Transaccion).WithOne(p => p.Vouchers)
-                .HasForeignKey<Vouchers>(d => d.TransaccionId)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("FK__Vouchers__Transa__0C50D423");
         });
 
         OnModelCreatingPartial(modelBuilder);

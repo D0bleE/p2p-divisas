@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CambioDivisasP2P.CORE.Core.Entities;
+namespace CambioDivisasP2P.API.Core.Entities;
 
 public partial class Usuarios
 {
@@ -33,7 +33,9 @@ public partial class Usuarios
 
     public virtual ICollection<MovimientosFondos> MovimientosFondos { get; set; } = new List<MovimientosFondos>();
 
-    public virtual ICollection<Ofertas> Ofertas { get; set; } = new List<Ofertas>();
+    public virtual ICollection<Ofertas> OfertasUsuario { get; set; } = new List<Ofertas>();
+
+    public virtual ICollection<Ofertas> OfertasUsuarioComprador { get; set; } = new List<Ofertas>();
 
     public virtual Roles RolNavigation { get; set; } = null!;
 }
