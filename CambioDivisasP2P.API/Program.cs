@@ -4,9 +4,22 @@ using CambioDivisasP2P.CORE.Core.Entities; // Ajusta según la ruta donde se gua
 
 var builder = WebApplication.CreateBuilder(args);
 
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowVueApp",
+        policy =>
+        {
+            policy
+                .WithOrigins("http://localhost:9000")
+                .AllowAnyHeader()
+                .AllowAnyMethod();
+        });
+});
+
 // Add services to the container.
 var _config = builder.Configuration;
-var cnx = _config.GetConnectionString("DevConnection");
+var cnx = _config.GetConnectionString("DefaultConnection");
+Console.WriteLine($"CONEXION = {cnx}");
 
 builder.Services.AddDbContext<CambioDivisasP2PContext>(options =>
   options.UseSqlServer(cnx));
@@ -16,6 +29,13 @@ builder.Services.AddControllers();
 builder.Services.AddOpenApi();
 builder.Services.AddHttpClient();
 var app = builder.Build();
+
+app.UseCors("AllowVueApp");
+
+//arreglar contraseñas incriptada
+Console.WriteLine(
+    BCrypt.Net.BCrypt.HashPassword("123456")
+);
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
