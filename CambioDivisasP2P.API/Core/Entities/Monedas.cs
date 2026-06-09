@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace CambioDivisasP2P.CORE.Core.Entities;
+namespace CambioDivisasP2P.API.Core.Entities;
 
 public partial class Monedas
 {

@@ -2,15 +2,15 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace CambioDivisasP2P.CORE.Core.Entities;
+namespace CambioDivisasP2P.API.Core.Entities;
 
-public partial class CambioDivisasP2PContext : DbContext
+public partial class CambioDivisasP2pContext : DbContext
 {
-    public CambioDivisasP2PContext()
+    public CambioDivisasP2pContext()
     {
     }
 
-    public CambioDivisasP2PContext(DbContextOptions<CambioDivisasP2PContext> options)
+    public CambioDivisasP2pContext(DbContextOptions<CambioDivisasP2pContext> options)
         : base(options)
     {
     }
@@ -61,40 +61,25 @@ public partial class CambioDivisasP2PContext : DbContext
 
         modelBuilder.Entity<Calificaciones>(entity =>
         {
-            // 1. Llave primaria limpia
             entity.HasKey(e => e.Id).HasName("PK__Califica__3214EC07FD593ED7");
-
-            // 2. Mapeo explícito de columnas
-            entity.Property(e => e.OfertaId).HasColumnName("OfertaId");
-            entity.Property(e => e.UsuarioEvaluadorId).HasColumnName("UsuarioEvaluadorId");
-            entity.Property(e => e.UsuarioEvaluadoId).HasColumnName("UsuarioEvaluadoId");
-            entity.Property(e => e.Puntuacion).HasColumnName("Puntuacion");
 
             entity.Property(e => e.Comentario)
                 .HasMaxLength(255)
                 .IsUnicode(false);
-
             entity.Property(e => e.Fecha)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
 
-            // 3. Relación limpia con la tabla Ofertas
-            entity.HasOne(d => d.Oferta)
-                .WithMany()
+            entity.HasOne(d => d.Oferta).WithMany(p => p.Calificaciones)
                 .HasForeignKey(d => d.OfertaId)
-                .HasConstraintName("FK_Calificaciones_Ofertas")
-                .OnDelete(DeleteBehavior.Cascade); // Si se borra la oferta, se borra su calificación
+                .HasConstraintName("FK_Calificaciones_Ofertas");
 
-            // 4. Relación con el Usuario Evaluado
-            entity.HasOne(d => d.UsuarioEvaluado)
-                .WithMany(p => p.CalificacionesUsuarioEvaluado)
+            entity.HasOne(d => d.UsuarioEvaluado).WithMany(p => p.CalificacionesUsuarioEvaluado)
                 .HasForeignKey(d => d.UsuarioEvaluadoId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Calificac__Usuar__12FDD1B2");
 
-            // 5. Relación con el Usuario Evaluador
-            entity.HasOne(d => d.UsuarioEvaluador)
-                .WithMany(p => p.CalificacionesUsuarioEvaluador)
+            entity.HasOne(d => d.UsuarioEvaluador).WithMany(p => p.CalificacionesUsuarioEvaluador)
                 .HasForeignKey(d => d.UsuarioEvaluadorId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Calificac__Usuar__1209AD79");
@@ -107,7 +92,7 @@ public partial class CambioDivisasP2PContext : DbContext
             entity.Property(e => e.Banco)
                 .HasMaxLength(50)
                 .IsUnicode(false);
-            entity.Property(e => e.NumeroCCI)
+            entity.Property(e => e.NumeroCci)
                 .HasMaxLength(50)
                 .IsUnicode(false)
                 .HasColumnName("NumeroCCI");
@@ -146,11 +131,7 @@ public partial class CambioDivisasP2PContext : DbContext
                 .IsUnicode(false);
             entity.Property(e => e.Resolucion).IsUnicode(false);
 
-            entity.HasKey(e => e.Id);
-            entity.Property(e => e.OfertaId).HasColumnName("OfertaId");
-
-            entity.HasOne(d => d.Oferta)
-                .WithMany()
+            entity.HasOne(d => d.Oferta).WithMany(p => p.Disputas)
                 .HasForeignKey(d => d.OfertaId)
                 .HasConstraintName("FK_Disputas_Ofertas");
 
@@ -224,6 +205,7 @@ public partial class CambioDivisasP2PContext : DbContext
             entity.Property(e => e.FechaPublicacion)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime");
+            entity.Property(e => e.FechaTransaccion).HasColumnType("datetime");
             entity.Property(e => e.MontoOrigen).HasColumnType("decimal(18, 2)");
             entity.Property(e => e.TasaCambio).HasColumnType("decimal(18, 4)");
 
@@ -237,12 +219,14 @@ public partial class CambioDivisasP2PContext : DbContext
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Ofertas__MonedaO__7C1A6C5A");
 
-            entity.HasOne(d => d.Usuario).WithMany(p => p.Ofertas)
+            entity.HasOne(d => d.UsuarioComprador).WithMany(p => p.OfertasUsuarioComprador)
+                .HasForeignKey(d => d.UsuarioCompradorId)
+                .HasConstraintName("FK_Ofertas_Usuarios_Comprador");
+
+            entity.HasOne(d => d.Usuario).WithMany(p => p.OfertasUsuario)
                 .HasForeignKey(d => d.UsuarioId)
                 .OnDelete(DeleteBehavior.ClientSetNull)
                 .HasConstraintName("FK__Ofertas__Usuario__7B264821");
-            entity.Property(e => e.UsuarioCompradorId).HasColumnName("UsuarioCompradorId");
-            entity.Property(e => e.FechaTransaccion).HasColumnType("datetime").HasColumnName("FechaTransaccion");
         });
 
         modelBuilder.Entity<Roles>(entity =>
@@ -259,7 +243,6 @@ public partial class CambioDivisasP2PContext : DbContext
                 .IsUnicode(false);
         });
 
-        
         modelBuilder.Entity<Usuarios>(entity =>
         {
             entity.HasKey(e => e.Id).HasName("PK__Usuarios__3214EC0755E1D146");
