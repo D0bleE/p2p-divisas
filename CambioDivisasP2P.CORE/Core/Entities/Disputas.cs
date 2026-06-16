@@ -7,8 +7,6 @@ public partial class Disputas
 {
     public int Id { get; set; }
 
-    public int TransaccionId { get; set; }
-
     public int UsuarioDemandanteId { get; set; }
 
     public string Motivo { get; set; } = null!;
