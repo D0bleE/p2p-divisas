@@ -17,6 +17,7 @@ namespace CambioDivisasP2P.CORE.Core.DTOs
     // ACTUALIZADO: Ahora mapea el modelo Escrow de la base de datos
     public class BilleteraSaldoDTO
     {
+        public int MonedaId { get; set; } //CAMbiooooo
         public string MonedaCodigo { get; set; } = null!;
         public string MonedaNombre { get; set; } = null!;
         public string MonedaSimbolo { get; set; } = null!;

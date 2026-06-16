@@ -22,20 +22,27 @@ namespace CambioDivisasP2P.API.Controllers
         [HttpGet("saldos/{usuarioId}")]
         public async Task<IActionResult> ObtenerSaldos(int usuarioId)
         {
+            string urlBase = $"{Request.Scheme}://{Request.Host}"; //CAMBIO2
+
             var saldos = await _context.Billeteras
                 .Include(b => b.Moneda)
                 .Where(b => b.UsuarioId == usuarioId)
                 .Select(b => new BilleteraSaldoDTO
                 {
+                    MonedaId = b.MonedaId,  // CAMBIOOOOOOOOOO
                     MonedaCodigo = b.Moneda.CodigoIso,
                     MonedaNombre = b.Moneda.Nombre,
                     MonedaSimbolo = b.Moneda.Simbolo,
-                    MonedaBandera = b.Moneda.RutaBandera,
+                    MonedaBandera = $"{urlBase}{b.Moneda.RutaBandera}",//CAMBIO2
                     SaldoDisponible = b.SaldoDisponible, // CORREGIDO
                     SaldoBloqueado = b.SaldoBloqueado    // CORREGIDO
                 }).ToListAsync();
 
             return Ok(saldos);
+    
         }
+
+
+
     }
 }

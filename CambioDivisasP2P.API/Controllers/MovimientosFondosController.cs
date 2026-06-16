@@ -20,19 +20,47 @@ namespace CambioDivisasP2P.API.Controllers
         // FLUX DE USUARIO: SOLICITUDES
         // ==========================================
 
-        // 1. SOLICITAR RECARGA (Usuario sube su voucher)
+        // 1. SOLICITAR RECARGA (Usuario sube su voucher) //CAMBIOOO
         [HttpPost("solicitar-recarga")]
-        public async Task<IActionResult> SolicitarRecarga([FromBody] SolicitudMovimientoDTO model)
+        public async Task<IActionResult> SolicitarRecarga(
+            [FromForm] int usuarioId,
+            [FromForm] int monedaId,
+            [FromForm] decimal monto,
+            [FromForm(Name ="voucher")] IFormFile voucher)//CAMBIOOOOOOOOOOOO
         {
-            if (model.Monto <= 0) return BadRequest(new { message = "El monto debe ser mayor a cero." });
+            if (monto <= 0)
+                return BadRequest(new { message = "El monto debe ser mayor a cero." });
+
+            if (voucher == null || voucher.Length == 0)
+                return BadRequest(new { message = "Debes adjuntar un voucher." });
+
+            var extension = Path.GetExtension(voucher.FileName).ToLower();
+
+            if (extension != ".jpg" && extension != ".jpeg" && extension != ".png")
+                return BadRequest(new { message = "Solo se permiten archivos JPG o PNG." });
+
+            var carpeta = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot", "vouchers");
+
+            if (!Directory.Exists(carpeta))
+                Directory.CreateDirectory(carpeta);
+
+            var nombreArchivo = $"recarga_{usuarioId}_{Guid.NewGuid()}{extension}";
+            var rutaFisica = Path.Combine(carpeta, nombreArchivo);
+
+            using (var stream = new FileStream(rutaFisica, FileMode.Create))
+            {
+                await voucher.CopyToAsync(stream);
+            }
+
+            var rutaVoucher = $"/vouchers/{nombreArchivo}";
 
             var nuevoMovimiento = new MovimientosFondos
             {
-                UsuarioId = model.UsuarioId,
-                MonedaId = model.MonedaId,
+                UsuarioId = usuarioId,
+                MonedaId = monedaId,
                 TipoMovimiento = "RECARGA",
-                Monto = model.Monto,
-                RutaVoucher = model.RutaVoucher, // Simulado o path de archivo
+                Monto = monto,
+                RutaVoucher = rutaVoucher,
                 Estado = "PENDIENTE",
                 FechaSolicitud = DateTime.Now
             };
@@ -40,7 +68,11 @@ namespace CambioDivisasP2P.API.Controllers
             _context.MovimientosFondos.Add(nuevoMovimiento);
             await _context.SaveChangesAsync();
 
-            return Ok(new { message = "Solicitud de recarga enviada. Esperando aprobación del administrador." });
+            return Ok(new
+            {
+                message = "Solicitud de recarga enviada. Esperando aprobación del administrador.",
+                rutaVoucher
+            });
         }
 
         // 2. SOLICITAR RETIRO (Bloquea el saldo inmediatamente si tiene cuenta bancaria registrada)
