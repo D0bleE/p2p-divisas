@@ -62,8 +62,25 @@ namespace CambioDivisasP2P.API.Controllers
                 FechaRegistro = DateTime.Now,
                 Activo = true
             };
-
+            //CAMBIOOOOOOOOOOOOOOOOOOOO2
             _context.Usuarios.Add(nuevoUsuario);
+            await _context.SaveChangesAsync();
+
+            var monedasActivas = await _context.Monedas
+                .Where(m => m.Activo == true)
+                .ToListAsync();
+
+            foreach (var moneda in monedasActivas)
+            {
+                _context.Billeteras.Add(new Billeteras
+                {
+                    UsuarioId = nuevoUsuario.Id,
+                    MonedaId = moneda.Id,
+                    SaldoDisponible = 0,
+                    SaldoBloqueado = 0
+                });
+            }
+
             await _context.SaveChangesAsync();
 
             return Ok(new { message = "¡Cuenta creada con éxito! Ya puedes iniciar sesión." });
