@@ -223,6 +223,32 @@ namespace CambioDivisasP2P.API.Controllers
                 }).ToListAsync();
 
             return Ok(pendientes);
+      
         }
+
+        [HttpGet("usuario/{usuarioId}")]
+        public async Task<IActionResult> ObtenerMovimientosPorUsuario(int usuarioId)
+        {
+            var movimientos = await _context.MovimientosFondos
+                .Include(m => m.Moneda)
+                .Where(m => m.UsuarioId == usuarioId)
+                .OrderByDescending(m => m.FechaSolicitud)
+                .Select(m => new
+                {
+                    m.Id,
+                    m.TipoMovimiento,
+                    m.Monto,
+                    m.Estado,
+                    m.RutaVoucher,
+                    m.FechaSolicitud,
+                    m.FechaProcesado,
+                    MonedaCodigo = m.Moneda.CodigoIso,
+                    MonedaSimbolo = m.Moneda.Simbolo
+                })
+                .ToListAsync();
+
+            return Ok(movimientos);
+        }
+
     }
 }

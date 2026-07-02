@@ -314,5 +314,39 @@ namespace CambioDivisasP2P.API.Controllers
                 return StatusCode(500, new { message = $"Error interno en la transacción segura: {ex.Message}" });
             }
         }
+        [HttpGet("historial/{usuarioId}")]
+        public async Task<IActionResult> ObtenerHistorialP2P(int usuarioId)
+        {
+            var historial = await _context.Ofertas
+                .Include(o => o.Usuario)
+                .Include(o => o.MonedaOrigen)
+                .Include(o => o.MonedaDestino)
+                .Where(o =>
+                    o.UsuarioId == usuarioId ||
+                    o.UsuarioCompradorId == usuarioId)
+                .OrderByDescending(o => o.FechaTransaccion ?? o.FechaPublicacion)
+                .Select(o => new
+                {
+                    o.Id,
+                    CreadorId = o.UsuarioId,
+                    CompradorId = o.UsuarioCompradorId,
+                    CreadorNombre = o.Usuario.NombreCompleto,
+                    MonedaOrigenCodigo = o.MonedaOrigen.CodigoIso,
+                    MonedaOrigenSimbolo = o.MonedaOrigen.Simbolo,
+                    MonedaDestinoCodigo = o.MonedaDestino.CodigoIso,
+                    MonedaDestinoSimbolo = o.MonedaDestino.Simbolo,
+                    o.MontoOrigen,
+                    o.TasaCambio,
+                    MontoDestino = o.MontoOrigen * o.TasaCambio,
+                    o.Estado,
+                    o.FechaPublicacion,
+                    o.FechaTransaccion,
+                    RolUsuario = o.UsuarioId == usuarioId ? "CREADOR" : "COMPRADOR"
+                })
+                .ToListAsync();
+
+            return Ok(historial);
+        }
+
     }
 }
