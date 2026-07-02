@@ -51,7 +51,7 @@ namespace CambioDivisasP2P.API.Controllers
                 MonedaDestinoId = model.MonedaDestinoId,
                 MontoOrigen = model.MontoOrigen,
                 TasaCambio = model.TasaCambio,
-                Estado = "ACTIVA",
+                Estado = "DISPONIBLE",
                 FechaPublicacion = DateTime.Now
                 // Puedes concatenar la descripción opcional en algún campo de texto si tu tabla lo permite
             };
@@ -78,7 +78,7 @@ namespace CambioDivisasP2P.API.Controllers
 
             if (oferta == null) return NotFound(new { message = "La oferta no existe." });
 
-            if (oferta.Estado != "ACTIVA")
+            if (oferta.Estado != "DISPONIBLE")
             {
                 return BadRequest(new { message = $"No se puede cancelar esta oferta porque su estado actual es: {oferta.Estado}." });
             }
@@ -110,7 +110,7 @@ namespace CambioDivisasP2P.API.Controllers
                 .Include(o => o.Usuario)
                 .Include(o => o.MonedaOrigen)
                 .Include(o => o.MonedaDestino)
-                .Where(o => o.Estado == "ACTIVA")
+                .Where(o => o.Estado == "DISPONIBLE")
                 .Select(o => new
                 {
                     o.Id,
@@ -154,7 +154,7 @@ namespace CambioDivisasP2P.API.Controllers
                 .Include(o => o.Usuario)
                 .Include(o => o.MonedaOrigen)
                 .Include(o => o.MonedaDestino)
-                .Where(o => o.Estado == "ACTIVA" &&
+                .Where(o => o.Estado == "DISPONIBLE" &&
                             o.MonedaOrigenId == quieroMonedaId &&  // Lo que el creador vende es lo que tú quieres
                             o.MonedaDestinoId == tengoMonedaId)    // Lo que el creador pide es lo que tú tienes
                 .Select(o => new
@@ -206,7 +206,7 @@ namespace CambioDivisasP2P.API.Controllers
             // 1. Validaciones básicas de la oferta
             if (oferta == null) return NotFound(new { message = "La oferta no existe." });
 
-            if (oferta.Estado != "ACTIVA")
+            if (oferta.Estado != "DISPONIBLE")
             {
                 return BadRequest(new { message = "Esta oferta ya no está disponible, fue cancelada o tomada por otro usuario." });
             }
