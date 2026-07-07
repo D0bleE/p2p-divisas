@@ -250,5 +250,42 @@ namespace CambioDivisasP2P.API.Controllers
             return Ok(movimientos);
         }
 
+        // AGREGAR EL ENPOIT DE ADMINHISTORIAL 
+        [HttpGet("admin/historial")]
+        public async Task<IActionResult> ObtenerHistorialAdmin()
+        {
+            var movimientos = await _context.MovimientosFondos
+                .Include(m => m.Usuario)
+                .Include(m => m.Moneda)
+                .OrderByDescending(m => m.FechaSolicitud)
+                .Select(m => new
+                {
+                    m.Id,
+                    UsuarioId = m.UsuarioId,
+                    UsuarioNombre = m.Usuario.NombreCompleto,
+                    UsuarioEmail = m.Usuario.Email,
+                    m.TipoMovimiento,
+                    m.Monto,
+                    m.Estado,
+                    m.RutaVoucher,
+                    m.FechaSolicitud,
+                    m.FechaProcesado,
+                    MonedaCodigo = m.Moneda.CodigoIso,
+                    MonedaSimbolo = m.Moneda.Simbolo
+                })
+                .ToListAsync();
+
+            return Ok(movimientos);
+        }
+
+
+
+
+
+
+
+
+
+
     }
 }
