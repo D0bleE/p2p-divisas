@@ -203,6 +203,52 @@ namespace CambioDivisasP2P.API.Controllers
             return Ok(ofertasFiltradas);
         }
 
+        [HttpGet("matches/{usuarioId}")]
+        public async Task<IActionResult> ObtenerMatches(int usuarioId)
+        {
+            var misOfertas = await _context.Ofertas
+                .Where(o => o.UsuarioId == usuarioId && o.Estado == "DISPONIBLE")
+                .ToListAsync();
+
+            var matches = new List<object>();
+
+            foreach (var miOferta in misOfertas)
+            {
+                var compatibles = await _context.Ofertas
+                    .Include(o => o.Usuario)
+                    .Include(o => o.MonedaOrigen)
+                    .Include(o => o.MonedaDestino)
+                    .Where(o =>
+                        o.Estado == "DISPONIBLE" &&
+                        o.UsuarioId != usuarioId &&
+                        o.MonedaOrigenId == miOferta.MonedaDestinoId &&
+                        o.MonedaDestinoId == miOferta.MonedaOrigenId)
+                    .Select(o => new
+                    {
+                        MiOfertaId = miOferta.Id,
+                        OfertaId = o.Id,
+                        CreadorId = o.UsuarioId,
+                        CreadorNombre = o.Usuario.NombreCompleto,
+
+                        MonedaOrigenCodigo = o.MonedaOrigen.CodigoIso,
+                        MonedaOrigenSimbolo = o.MonedaOrigen.Simbolo,
+                        MontoOfrecido = o.MontoOrigen,
+
+                        MonedaDestinoCodigo = o.MonedaDestino.CodigoIso,
+                        MonedaDestinoSimbolo = o.MonedaDestino.Simbolo,
+
+                        TasaCambio = o.TasaCambio,
+                        MontoARecibir = o.MontoOrigen * o.TasaCambio,
+                        FechaPublicacion = o.FechaPublicacion
+                    })
+                    .ToListAsync();
+
+                matches.AddRange(compatibles);
+            }
+
+            return Ok(matches);
+        }
+
         // 5. ACEPTAR / TOMAR UNA OFERTA P2P (Intercambio directo y seguro de saldos)
         // POST: api/Ofertas/aceptar/12
         [HttpPost("aceptar/{id}")]
