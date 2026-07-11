@@ -95,7 +95,7 @@ namespace CambioDivisasP2P.API.Controllers
             }
 
             // Actualizar estado de la oferta
-            oferta.Estado = "CANCELADA";
+            oferta.Estado = "CANCELADO";
             oferta.FechaTransaccion = DateTime.Now;
             await _context.SaveChangesAsync();
 
