@@ -331,24 +331,52 @@ namespace CambioDivisasP2P.API.Controllers
                 .Where(o =>
                     o.UsuarioId == usuarioId ||
                     o.UsuarioCompradorId == usuarioId)
-                .OrderByDescending(o => o.FechaTransaccion ?? o.FechaPublicacion)
+                .OrderByDescending(o =>
+                    o.FechaTransaccion ?? o.FechaPublicacion)
                 .Select(o => new
                 {
                     o.Id,
+
                     CreadorId = o.UsuarioId,
                     CompradorId = o.UsuarioCompradorId,
                     CreadorNombre = o.Usuario.NombreCompleto,
+
                     MonedaOrigenCodigo = o.MonedaOrigen.CodigoIso,
                     MonedaOrigenSimbolo = o.MonedaOrigen.Simbolo,
+
                     MonedaDestinoCodigo = o.MonedaDestino.CodigoIso,
                     MonedaDestinoSimbolo = o.MonedaDestino.Simbolo,
+
                     o.MontoOrigen,
                     o.TasaCambio,
+
                     MontoDestino = o.MontoOrigen * o.TasaCambio,
+
                     o.Estado,
                     o.FechaPublicacion,
                     o.FechaTransaccion,
-                    RolUsuario = o.UsuarioId == usuarioId ? "CREADOR" : "COMPRADOR"
+
+                    RolUsuario = o.UsuarioId == usuarioId
+                        ? "CREADOR"
+                        : "COMPRADOR",
+
+                    YaCalifico = _context.Calificaciones.Any(c =>
+                        c.OfertaId == o.Id &&
+                        c.UsuarioEvaluadorId == usuarioId),
+
+                    CalificacionDada = _context.Calificaciones
+                        .Where(c =>
+                            c.OfertaId == o.Id &&
+                            c.UsuarioEvaluadorId == usuarioId)
+                        .Select(c => (int?)c.Puntuacion)
+                        .FirstOrDefault(),
+
+                    PuedeCalificar =
+                        o.Estado == "COMPLETADO" &&
+                        o.UsuarioCompradorId == usuarioId &&
+                        !_context.Calificaciones.Any(c =>
+                            c.OfertaId == o.Id &&
+                            c.UsuarioEvaluadorId == usuarioId)
                 })
                 .ToListAsync();
 
