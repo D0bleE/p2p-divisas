@@ -30,6 +30,7 @@ namespace CambioDivisasP2P.API.Controllers
                 .Select(b => new BilleteraSaldoDTO
                 {
                     MonedaId = b.MonedaId,  // CAMBIOOOOOOOOOO
+                    MonedaActiva = b.Moneda.Activo ?? false,
                     MonedaCodigo = b.Moneda.CodigoIso,
                     MonedaNombre = b.Moneda.Nombre,
                     MonedaSimbolo = b.Moneda.Simbolo,

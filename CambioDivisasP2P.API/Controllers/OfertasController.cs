@@ -130,6 +130,13 @@ namespace CambioDivisasP2P.API.Controllers
 
                     MontoARecibir = o.MontoOrigen * o.TasaCambio,
 
+                    CalificacionPromedio = _context.Calificaciones
+                    .Where(c => c.UsuarioEvaluadoId == o.UsuarioId)
+                    .Average(c => (decimal?)c.Puntuacion) ?? 0,
+
+                    TotalCalificaciones = _context.Calificaciones
+                    .Count(c => c.UsuarioEvaluadoId == o.UsuarioId),
+
                     o.FechaPublicacion
                 })
                 .OrderByDescending(o => o.FechaPublicacion)

@@ -24,5 +24,7 @@ namespace CambioDivisasP2P.CORE.Core.DTOs
         public string MonedaBandera { get; set; } = null!;
         public decimal SaldoDisponible { get; set; } // Dinero libre para usar
         public decimal SaldoBloqueado { get; set; }  // Dinero congelado en la pizarra
+        public bool MonedaActiva { get; set; }
+
     }
 }
