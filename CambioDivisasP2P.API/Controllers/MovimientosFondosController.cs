@@ -43,6 +43,16 @@ namespace CambioDivisasP2P.API.Controllers
 
             if (!Directory.Exists(carpeta))
                 Directory.CreateDirectory(carpeta);
+            var monedaActiva = await _context.Monedas
+            .AnyAsync(m => m.Id == monedaId && m.Activo == true);
+
+            if (!monedaActiva)
+            {
+                return BadRequest(new
+                {
+                    message = "Esta moneda está deshabilitada y no admite recargas."
+                });
+            }
 
             var nombreArchivo = $"recarga_{usuarioId}_{Guid.NewGuid()}{extension}";
             var rutaFisica = Path.Combine(carpeta, nombreArchivo);
